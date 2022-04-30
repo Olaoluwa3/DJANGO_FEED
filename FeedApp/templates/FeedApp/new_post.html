@@ -1,0 +1,31 @@
+{% extends "FeedApp/base.html" %}
+{% load bootstrap4 %}
+
+<!--
+    Include enctype property in the form tag for the uploaded 
+    file to be attached to the request properly.
+    
+    enctype property helps images to be attached 
+    to the post request and we can attach it from other files
+
+    Bootstrap is helpful to make it turn blue when you hover over it
+-->
+
+{% block content %}
+<h2>
+    <p>New Post:</p>
+</h2>
+
+<form action="{% url 'FeedApp:new_post' %}" method="post" enctype="multipart/form-data">
+
+    {% csrf_token %}
+    {% bootstrap_form form %}
+
+    <br><br>
+    <button name="submit" class="btn btn-outline-primary">Post</button>
+
+
+
+</form>
+
+{% endblock content %}
