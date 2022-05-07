@@ -18,7 +18,7 @@ def register(request):
         #The save() method returns the newly created user object, 
         # which we assign to new_user.
             new_user = form.save()
-        # Log the user in and then redirect to home page.
+        # Log the user in and then redirect to profile page.
             login(request, new_user)
             return redirect('FeedApp:profile')
 
