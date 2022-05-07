@@ -20,7 +20,7 @@ def register(request):
             new_user = form.save()
         # Log the user in and then redirect to home page.
             login(request, new_user)
-            return redirect('FeedApp:index')
+            return redirect('FeedApp:profile')
 
 # Display a blank or invalid form.
     context = {'form': form}

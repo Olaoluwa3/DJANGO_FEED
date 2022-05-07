@@ -35,8 +35,8 @@ INSTALLED_APPS = [
     'FeedApp',
     'users',
      #third party apps
-    'bootstrap4',
-    'crispy_forms',
+    'bootstrap4',      #relate to the formatting of our webpages to make them look prettier
+    'crispy_forms',    #relate to the formatting of our webpages to make them look prettier
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 #TIME_ZONE = 'UTC'
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'America/Chicago'   #Changed the timezone
 
 USE_I18N = True
 
@@ -132,6 +132,8 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'users:login'
+
+AUTH_PROFILE_MODULE = 'FeedApp.Profile'
 
 
 #Heroku settings.

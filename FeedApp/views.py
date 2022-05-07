@@ -20,55 +20,56 @@ def index(request):
 
 
 
-@login_required
+@login_required   #Helps prevent unauthorized access. Not needed for the home page 
 def profile(request):
-    profile = Profile.objects.filter(user=request.user)  #We use user to get their profile.Used filter instead of get because get does not work with profile.exists
-    if not profile.exists():
-        Profile.objects.create(user=request.user)
+    profile = Profile.objects.filter(user=request.user)  #We use user (in Profile class) to get the specific profile of a user. Used filter instead of get because get does not work with profile.exists
+    if not profile.exists(): #if a profile doesnt exist for this user
+        Profile.objects.create(user=request.user) #create one for them
     profile = Profile.objects.get(user=request.user)    #Now we can get it because we know it exists
 
-    if request.method != 'POST':
-        form = ProfileForm(instance=profile) #Get a specific instance of the profile
-    else:  #Trying to save to the database
-        form = ProfileForm(instance=profile,data=request.POST)
-        if form.is_valid():
+    if request.method != 'POST':  #Means the method is GET and is just trying to load the webpage
+        form = ProfileForm(instance=profile) #Load a specific instance of the profile. Forms were created in forms.py
+    else:  #Trying to save to the database (request method is post)
+        form = ProfileForm(instance=profile,data=request.POST) #data coming in from the webpage is what we'll save
+        if form.is_valid(): 
             form.save()
-            return redirect('FeedApp:profile') #Take them back to profiel page
+            return redirect('FeedApp:profile') #Take them to profile page (Stay in same page)
 
-    context = {'form': form}
+    context = {'form': form}  #send the form through the context dictionary to profile.html file
     return render(request, 'FeedApp/profile.html', context)
 
 
 @login_required
 def myfeed(request):
-    comment_count_list = []
-    like_count_list = []
-    posts = Post.objects.filter(username=request.user).order_by('-date_posted')   #filter allows us to get all the posts; sort by date
-    for p in posts:
-        c_count = Comment.objects.filter(post=p).count()  #see how many comments a post has
-        l_count = Like.objects.filter(post=p).count()    #count how many likes a post has
-        comment_count_list.append(c_count)
+    comment_count_list = []   #To hold the number of comments for each post
+    like_count_list = []  #To hold the number of likes for each post
+    posts = Post.objects.filter(username=request.user).order_by('-date_posted')   #filter allows us to get all the posts; sort by date; all the posts that belong to a certain user
+    for p in posts: #For each post
+        c_count = Comment.objects.filter(post=p).count()  #see how many comments a specific post has
+        l_count = Like.objects.filter(post=p).count()    #count how many likes a specific post has
+        comment_count_list.append(c_count)  
         like_count_list.append(l_count)
-    zipped_list = zip(posts, comment_count_list, like_count_list)  #iterate through it all at the same time in order to pass it all to context
+    zipped_list = zip(posts, comment_count_list, like_count_list)  #iterate through it all at the same time in order to pass it all to context; each post, the number of comments, the number of likes
 
     context = {'posts':posts, 'zipped_list':zipped_list}
-    return render(request, 'FeedApp/myfeed.html', context)
+    return render(request, 'FeedApp/myfeed.html', context)  #render it to myfeed page
 
 
 @login_required
 def new_post(request):
-    if request.method != 'POST':
+    if request.method != 'POST':  #If get request, load an empty form
         form = PostForm()
     else:
-        form = PostForm(request.POST,request.FILES)   #Get everything coming in from the form
+        form = PostForm(request.POST,request.FILES)   #Get everything coming in from the form, save the image that comes with the files
         if form.is_valid():
-            new_post=form.save(commit=False)
-            new_post.username = request.user
-            new_post.save()
+            new_post=form.save(commit=False)  #Saving but not writing to the database yet
+            new_post.username = request.user  #Assign the username first
+            new_post.save()    #Now can save
             return redirect('FeedApp:myfeed')
 
-    context = { 'form':form }
+    context = {'form':form}
     return render(request, 'FeedApp/new_post.html', context)
+
 
 @login_required
 def friendsfeed(request):
@@ -99,11 +100,11 @@ def friendsfeed(request):
 @login_required
 def comments(request, post_id):
     if request.method == 'POST' and request.POST.get("btn1"):   #check to see if request is post and submit button was clicked
-        comment = request.POST.get("comment")
-        Comment.objects.create(post_id=post_id, username=request.user, text=comment, date_added=date.today())
+        comment = request.POST.get("comment")   #get the comment text that is in the box. We named the input in html 'comment'
+        Comment.objects.create(post_id=post_id, username=request.user, text=comment, date_added=date.today()) #create a new comment object
 
-    comments = Comment.objects.filter(post=post_id)
-    post = Post.objects.get(id=post_id)
+    comments = Comment.objects.filter(post=post_id)  #Get all the comments for a particular post
+    post = Post.objects.get(id=post_id)  #Get the corresponding post as well so we know what post it is associated to
 
     context = {'post':post, 'comments':comments}
     return render(request, 'FeedApp/comments.html', context)
